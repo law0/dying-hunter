@@ -8,6 +8,72 @@ import socket
 import sys
 import time
 
+def dhapi_get_socket(server_addr='localhost', server_port=8082):
+    if not hasattr(dhapi_get_socket, "sock"):
+        dhapi_get_socket.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_address = (server_addr, server_port)
+        dhapi_get_socket.sock.connect(server_address)
+    return dhapi_get_socket.sock
+
+# Subscribe ourselves to the game server
+def dhapi_send_hello(team_name):
+    print("Sending hello {}".format(team_name))
+    cmd = "HELLO:"+team_name
+
+    #server needs strings of 12 chars Exactly
+    cmd = cmd.rjust(12," ")
+
+    sock = dhapi_get_socket()
+
+    sock.sendall(cmd.encode("utf-8"))
+    res = sock.recv(2).decode("utf-8")
+    if res != "OK":
+        print("Hello was refused")
+        return False
+    return True
+
+# Move UP
+def dhapi_send_UP():
+    dhapi_get_socket().sendall("MOVE:UP".rjust(12, " ").encode("utf-8"))
+
+# Move DOWN
+def dhapi_send_DOWN():
+    dhapi_get_socket().sendall("MOVE:DOWN".rjust(12, " ").encode("utf-8"))
+
+# Move LEFT
+def dhapi_send_LEFT():
+    dhapi_get_socket().sendall("MOVE:LEFT".rjust(12, " ").encode("utf-8"))
+
+# Move RIGHT
+def dhapi_send_RIGHT():
+    dhapi_get_socket().sendall("MOVE:RIGHT".rjust(12, " ").encode("utf-8"))
+
+# Ask the game server for a view of current game status
+def dhapi_get_view():
+    cmd = "VIEW"
+    cmd = cmd.rjust(12," ")
+
+    sock = dhapi_get_socket()
+
+    sock.sendall(cmd.encode("utf-8"))
+    res = sock.recv(2).decode("utf-8")
+
+    #After a VIEW cmd, server returns "LG"
+    if res != "LG":
+        return None
+
+    jsonLen = int(sock.recv(4).decode("utf-8"))
+    jsonData = sock.recv(jsonLen).decode("utf-8")
+    #Retrieve last OK
+
+    res = sock.recv(2).decode("utf-8")
+    view = json.loads(jsonData)
+
+    return view
+
+
+
+
 class Player:
     def __init__(self, x, y):
         self.x = x
@@ -19,33 +85,22 @@ def init_arguments():
                           help='Name of the client', default="Dumb")
     return parser.parse_args()
 
+
+
 def main():
     arg_parsed = init_arguments()
     myName = arg_parsed.name
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_address = ('localhost', 8082)
-    sock.connect(server_address)
-    print("Sending hello")
-    cmd = "HELLO:"+myName
-    cmd = cmd.rjust(12," ")
-    sock.sendall(cmd.encode("utf-8"))
-    res = sock.recv(2).decode("utf-8")
-    if res != "OK":
-        print("Hello was refused")
+    
+    if not dhapi_send_hello(myName):
+        print("Couldn't say hello")
         return 1
+
     xTurn = True
     while True:
-        cmd = "VIEW"
-        cmd = cmd.rjust(12," ")
-        sock.sendall(cmd.encode("utf-8"))
-        res = sock.recv(2).decode("utf-8")
-        if res != "LG":
+        view = dhapi_get_view()
+        if view is None:
             continue
-        jsonLen = int(sock.recv(4).decode("utf-8"))
-        jsonData = sock.recv(jsonLen).decode("utf-8")
-        #Retrive last OK
-        res = sock.recv(2).decode("utf-8")
-        view = json.loads(jsonData)
+
         state = view["state"]
         if state != 2:
             #Game is pending, ready or ended so nothing to do
@@ -56,9 +111,10 @@ def main():
         players = []
         imHunter = False
         board = view["board"]
-        #Readind the board
-        for x in range(0,len(board)):
-            for y in range(0,len(board[0])):
+
+        #Reading the board
+        for x in range(len(board)):
+            for y in range(len(board[0])):
                 if len(board[x][y]) != 0:
                     split = board[x][y].split("/")
                     name = split[0]
@@ -75,6 +131,7 @@ def main():
                         hunter.y = y
                     else:
                         players.append(Player(x, y))
+
         #Choose what to do
         direction = ""
         if imHunter:
@@ -87,6 +144,7 @@ def main():
                 if dist < 0 or player_dist < dist:
                     dist = player_dist
                     target = player
+
             print("Target x:{} y:{}".format(target.x, target.y))
             print("Me x:{} y:{}".format(me.x, me.y))
             if xTurn:
@@ -109,10 +167,20 @@ def main():
                 direction = "DOWN"
                 if(hunter.y >= me.y):
                     direction = "UP"
+
+
+
         print(direction)
-        cmd = "MOVE:"+direction
-        cmd = cmd.rjust(12," ")
-        sock.sendall(cmd.encode("utf-8"))
+        if direction == "UP":
+            dhapi_send_UP()
+        elif direction == "DOWN":
+            dhapi_send_DOWN()
+        elif direction == "LEFT":
+            dhapi_send_LEFT()
+        elif direction == "RIGHT":
+            dhapi_send_RIGHT()
+
+
         xTurn = not xTurn
         time.sleep(1)
 
