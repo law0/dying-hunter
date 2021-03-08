@@ -48,7 +48,7 @@ class Arena:
         self.initBoard()
 
     def addPlayer(self, name):
-        if self.state != State.PENDING:
+        if self.state != State.PENDING and self.state != State.TOURNAMENTSUB:
             return None
         player = Player(name)
         placed = False

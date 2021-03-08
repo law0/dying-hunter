@@ -75,7 +75,7 @@ class Server:
                 if not self.tournamentManager.isPlayer(name):
                     print("Connection of "+name+" refused : not found")
                     return False
-        return self.playerManager.connectPlayer(name)
+        return self.playerManager.connectPlayer(name, False)
 
     def addMoveRequest(self, name, direction):
         return self.playerManager.addMoveRequest(name, direction)
@@ -101,8 +101,8 @@ class Server:
         if cmd.startswith("setMode"):
             self.changeMode(ServerMode.fromString(cmd.split()[1]))
             return None
-        if cmd.startswith("getMode"):
-            return ServerMode.toString(self.mode)
+        if cmd.startswith("getServerView"):
+            return self.getServerView()
         if cmd == "startPG":
             if self.mode == ServerMode.DEMO:
                 self.setupPlayground(True)
@@ -123,12 +123,52 @@ class Server:
             else:
                 self.runPlayground()
 
-
     def changeMode(self, mode):
         if mode == self.mode:
             return
         self.dump()
         self.mode = mode
+
+    def getServerView(self):
+        view = {}
+        view["mode"] = ServerMode.toString(self.mode)
+        if self.mode == ServerMode.TOURNAMENT:
+            if self.tournamentManager.state == TournamentState.PROGRAMMED:
+                view["CurServerStep"] = "stopped"
+                view["CurGameStatus"] = "none"
+            elif self.tournamentManager.state == TournamentState.SUBSCRIPTION:
+                view["CurServerStep"] = "subscription"
+                view["CurGameStatus"] = "none"
+            elif self.tournamentManager.state == TournamentState.COMPUTING or self.tournamentManager.state == TournamentState.READY:
+                view["CurServerStep"] = "running"
+                view["CurGameStatus"] = "none"
+            elif self.tournamentManager.state == TournamentState.STARTED:
+                view["CurServerStep"] = "running"
+                if self.tournamentManager.currentArena == None :
+                    view["CurGameStatus"] = "none"
+                elif self.tournamentManager.currentArena.state == State.ENDED:
+                    view["CurGameStatus"] = "ended"
+                elif self.tournamentManager.currentArena.state == State.PENDING:
+                    view["CurGameStatus"] = "pending"
+                else:
+                    view["CurGameStatus"] = "running"
+            else:
+                view["CurServerStep"] = "stopped"
+                view["CurGameStatus"] = "ended"
+        else:
+            if len(self.arenas) == 0:
+                view["CurServerStep"] = "stopped"
+                view["CurGameStatus"] = "none"
+            elif self.arenas[0].state == State.ENDED:
+                view["CurServerStep"] = "started"
+                view["CurGameStatus"] = "ended"
+            elif self.arenas[0].state == State.PENDING:
+                view["CurServerStep"] = "pending"
+                view["CurGameStatus"] = "pending"
+            else:
+                view["CurServerStep"] = "started"
+                view["CurGameStatus"] = "running"
+        return view
 
     def setupPlayground(self, withBots):
         id = self.addPlaygroundArena(6,6)

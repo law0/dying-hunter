@@ -10,8 +10,14 @@ class GameAdminViewer {
         }
         this.socket.onmessage = function(event) {
             var data = JSON.parse(event.data)
-            var changed = that.cur_mode != data
-            that.cur_mode = data
+            var mode = data["mode"]
+            var cur_step = data["CurServerStep"]
+            var cur_game = data["CurGameStatus"]
+            console.log(cur_step)
+            var changed = that.cur_mode != mode
+            that.cur_mode = mode
+            that.cur_step = cur_step
+            that.cur_game = cur_game
             if (changed) {
                 that.cur_step = "stopped"
                 let nextStepNode = document.getElementById("NextStep");
@@ -19,16 +25,19 @@ class GameAdminViewer {
             }
             let modeNode = document.getElementById("CurrentMode");
             let stepNode = document.getElementById("CurrentStep");
+            let gameNode = document.getElementById("CurrentGame");
             modeNode.innerHTML = "Mode : "+that.cur_mode
             stepNode.innerHTML = "Step : "+that.cur_step
+            gameNode.innerHTML = "Game : "+that.cur_game
         }
         this.cur_mode = "demo"
         this.cur_step = "stopped"
+        this.cur_game = "none"
     }
 
     fetchData() {
         if (this.connected) {
-            this.socket.send("getMode")
+            this.socket.send("getServerView")
         }
     }
 
@@ -45,34 +54,27 @@ class GameAdminViewer {
             var cmd = "Undef"
             if (this.cur_mode == "tournament") {
                 if(this.cur_step == "stopped") {
-                    this.cur_step = "subscription"
                     nextStepName = "close subscription"
                     cmd = "startTournament"
                 } else if (this.cur_step == "subscription") {
-                    this.cur_step = "running"
                     nextStepName = "Launch"
                     cmd = "closeSubs"
                 } else {
-                    this.cur_step = "running"
                     nextStepName = "Start next game"
                     cmd = "startNextGame"
                 }
             } else {
                 if(this.cur_step == "stopped") {
                     if (this.cur_mode == "demo") {
-                        this.cur_step = "started"
                         nextStepName = "Stop"
                     } else {
-                        this.cur_step = "pending"
                         nextStepName = "Run"
                     }
                     cmd = "startPG"
                 } else if(this.cur_step == "pending") {
-                    this.cur_step = "started"
                     nextStepName = "Stop"
                     cmd = "startNextGame"
                 } else {
-                    this.cur_step = "stopped"
                     nextStepName = "Start"
                     cmd = "stopPG"
                 }

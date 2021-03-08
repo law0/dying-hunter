@@ -77,6 +77,8 @@ class TournamentManager:
                     winner = ""
             elif i == self.nextMatch-1:
                 state = "RUNNING"
+                if self.currentArena.state == State.ENDED:
+                    state = "DONE"
             view.append((state,winner,arenaId))
         return view
 
@@ -90,7 +92,7 @@ class TournamentManager:
             if ranking != None:
                 pts = len(ranking)
                 for i in range(len(ranking)):
-                    ranking[i] = pts
+                    self.players[ranking[i]] = pts
                     if pts > 2:
                         pts = pts - 2
                     else:
@@ -114,8 +116,6 @@ class TournamentManager:
             arenaId = self.game.addArena(size,size)
             self.matchArenas.append(arenaId)
             arena = self.game.getArena(arenaId)
-            for player in self.players.keys():
-                arena.addPlayer(player)
 
     def setupNextMatch(self):
         if self.state != TournamentState.STARTED:
@@ -130,27 +130,5 @@ class TournamentManager:
     def startNextMatch(self):
         if self.state != TournamentState.STARTED:
             return False
-        if self.nextMatch >= len(self.matchs):
-            return False
         self.currentArena.startGame()
         return True
-
-
-    def localTestRun(self):
-        testPlayers = ["Dummy", "Fake", "Troll", "Rapid", "FCE", "Parrot"]
-        directions = ["UP", "LEFT", "DOWN", "RIGHT"]
-        self.openSubscription()
-        for player in testPlayers:
-            self.addPlayer(player)
-        self.closeSubscription()
-        self.startTournament()
-        doContinue = True
-        while doContinue:
-            doContinue = setupNextMatch() and self.startNextMatch()
-            while self.currentArena.state != State.ENDED:
-                for player in testPlayers:
-                    if self.currentArena.getPlayer(player).alive:
-                        self.currentArena.move(player, random.choice(directions))
-                time.sleep(1)
-            time.sleep(1)
-            self.computeRanking()

@@ -17,7 +17,7 @@ class PlayerManager:
     def setArena(self, arena):
         self.arena = arena
         for who in self.players.keys():
-            self.addPlayer(who)
+            self.connectPlayer(who, True)
 
     def getArenaView(self):
         if self.arena == None:
@@ -34,10 +34,10 @@ class PlayerManager:
             return
         self.bots[name] = self.arena.addPlayer(name)
 
-    def connectPlayer(self, name):
+    def connectPlayer(self, name, newArena):
         if self.arena == None:
             return False
-        if not name in self.players.keys():
+        if not name in self.players.keys() or newArena:
             self.players[name] = [self.arena.addPlayer(name), None] # 0: player 1: direction
         return True
 

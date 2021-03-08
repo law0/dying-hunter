@@ -31,6 +31,7 @@ class GameViewer {
         let stateRemainingTicks = game["remainingTicks"];
         let stateNames = ["is pending", "- Round will start in ", "- Remining turn time : ", "is over"];
         let ranking = game["ranking"];
+        let rankingNode = document.getElementById("Ranking");
         document.getElementById("Title").innerHTML = "Game "+getUrlParam("id")+" "+stateNames[state];
         if (state == 1 || state == 2) {
             document.getElementById("Title").innerHTML += stateRemainingTicks+" seconds";
@@ -86,7 +87,6 @@ class GameViewer {
             }
             table.appendChild(line);
         }
-        let rankingNode = document.getElementById("Ranking");
         rankingNode.innerHTML = ""
         var ul = rankingNode.appendChild(document.createElement('ul'));
         for (var i in ranking) {
