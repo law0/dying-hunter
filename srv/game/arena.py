@@ -11,6 +11,7 @@ class State(IntEnum):
     READY = 1
     RUNNING = 2
     ENDED = 3
+    TOURNAMENTSUB = 4
 
 class Mode(IntEnum):
     NORMAL = 0

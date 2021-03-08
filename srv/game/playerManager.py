@@ -34,10 +34,11 @@ class PlayerManager:
             return
         self.bots[name] = self.arena.addPlayer(name)
 
-    def addPlayer(self, name):
+    def connectPlayer(self, name):
         if self.arena == None:
             return False
-        self.players[name] = [self.arena.addPlayer(name), None] # 0: player 1: direction
+        if not name in self.players.keys():
+            self.players[name] = [self.arena.addPlayer(name), None] # 0: player 1: direction
         return True
 
     def addMoveRequest(self, name, direction):

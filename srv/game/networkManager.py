@@ -43,7 +43,7 @@ class Connection:
 
     def setupPlayer(self, name):
         self.PlayerName = name
-        return self.game.addPlayer(self.PlayerName)
+        return self.game.connectPlayer(self.PlayerName)
 
     def handleMove(self, direction):
         return self.game.addMoveRequest(self.PlayerName, direction)

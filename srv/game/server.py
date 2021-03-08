@@ -65,8 +65,17 @@ class Server:
     def getTournamentManager(self):
         return self.tournamentManager
 
-    def addPlayer(self, name):
-        return self.playerManager.addPlayer(name)
+    def connectPlayer(self, name):
+        if self.mode == ServerMode.TOURNAMENT:
+            if self.tournamentManager.state == TournamentState.SUBSCRIPTION:
+                if not self.tournamentManager.addPlayer(name):
+                    print("Subscription of "+name+" refused : name already taken")
+                    return False
+            else:
+                if not self.tournamentManager.isPlayer(name):
+                    print("Connection of "+name+" refused : not found")
+                    return False
+        return self.playerManager.connectPlayer(name)
 
     def addMoveRequest(self, name, direction):
         return self.playerManager.addMoveRequest(name, direction)
@@ -134,6 +143,7 @@ class Server:
         self.playerManager.arena.startGame()
 
     def setupTournament(self):
+        self.playerManager.setArena(self.tournamentManager.pendingArena)
         self.tournamentManager.openSubscription()
 
     def launchTournament(self):

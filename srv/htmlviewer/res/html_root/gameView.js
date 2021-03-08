@@ -28,12 +28,12 @@ class GameViewer {
         let game = JSON.parse(event.data);
         let arena = game["board"];
         let state = game["state"];
-        let stateReminingTicks = game["remainingTicks"];
+        let stateRemainingTicks = game["remainingTicks"];
         let stateNames = ["is pending", "- Round will start in ", "- Remining turn time : ", "is over"];
         let ranking = game["ranking"];
         document.getElementById("Title").innerHTML = "Game "+getUrlParam("id")+" "+stateNames[state];
         if (state == 1 || state == 2) {
-            document.getElementById("Title").innerHTML += stateReminingTicks+" seconds";
+            document.getElementById("Title").innerHTML += stateRemainingTicks+" seconds";
         }
         let holder = document.getElementById("Board");
         holder.innerHTML = '';

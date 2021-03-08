@@ -17,9 +17,10 @@ class TournamentState(IntEnum):
     ENDED = 5
 
 class TournamentManager:
-    #We need at leat 3 teams !!!
 
     def __init__(self):
+        self.pendingArena = Arena(-1, 10, 10)
+        self.pendingArena.state = State.TOURNAMENTSUB
         self.state = TournamentState.PROGRAMMED
         self.players = {}
         self.matchs = []
@@ -31,6 +32,8 @@ class TournamentManager:
         self.game = game
 
     def dump(self):
+        self.pendingArena = Arena(-1, 10, 10)
+        self.pendingArena.state = State.TOURNAMENTSUB
         self.state = TournamentState.PROGRAMMED
         self.players = {}
         self.matchs = []
@@ -49,6 +52,9 @@ class TournamentManager:
             return True
         else:
             return False
+
+    def isPlayer(self, name):
+        return name in self.players.keys()
 
     def closeSubscription(self):
         self.state = TournamentState.COMPUTING
@@ -82,9 +88,13 @@ class TournamentManager:
             arenaId = self.matchArenas[i]
             ranking = self.game.getArena(arenaId).getRanking()
             if ranking != None:
-                self.players[ranking[0]] += 5
-                self.players[ranking[1]] += 3
-                self.players[ranking[2]] += 1
+                pts = len(ranking)
+                for i in range(len(ranking)):
+                    ranking[i] = pts
+                    if pts > 2:
+                        pts = pts - 2
+                    else:
+                        pts = 0
 
     def getRankingView(self):
         ranking = []
