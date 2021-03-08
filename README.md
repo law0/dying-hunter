@@ -7,3 +7,5 @@ It is based on the dying hunter game.
 
 To understand the game please see the [Rules](./RULES.md).
 To implement a client then you can see [Communication protocol](./TCP_PROTOCOL.md).
+
+To see how to control the server please see [Server instruction](./SERVER_INSTRUCTION.md).
