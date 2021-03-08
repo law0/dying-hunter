@@ -1,0 +1,26 @@
+table.board {
+    margin: 80px auto;
+    background: #999;
+    border: 25px solid #333;
+    /*border-collapse: collapse; /* */
+}
+td.board {
+    width: 70px; height: 70px;
+    border: 2px solid #333; /* */
+}
+tr.board:nth-child(odd) td.board:nth-child(even),
+tr.board:nth-child(even) td.board:nth-child(odd) {
+    background: white;
+}
+
+div.player {
+    text-align: center;
+    width: 70px; height: 70px;
+}
+
+span.logo {
+    margin-top: 10px;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+}

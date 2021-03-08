@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FCEE - Dying Wolf</title>
+        <script src="./admin.js" type="text/javascript"></script>
+    </head>
+    <body>
+        <h1>Dying wolf Admin interfaces</h1>
+        <table>
+            <tr>
+                <td>
+                    <button id="ModeDemo" onclick='sendCmd("setMode demo")'>Mode demo</button>
+                </td>
+                <td>
+                    <button id="ModePGBots" onclick='sendCmd("setMode pgbots")'>Mode playground with dummys</button>
+                </td>
+                <td>
+                    <button id="ModePGEmpty" onclick='sendCmd("setMode pgempty")'>Mode playground no bots</button>
+                </td>
+                <td>
+                    <button id="ModeTournament" onclick='sendCmd("setMode tournament")'>Mode tournaments</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="height: 20px;"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button id="NextStep" onclick="nextStep()">Start</button>
+                </td>
+            </tr>
+        </table>
+        <br>
+        <br>
+        <span id="CurrentMode">loading</span>
+        <br>
+        <span id="CurrentStep"></span>
+    </body>
+</html>

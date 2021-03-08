@@ -1,0 +1,13 @@
+# Dying hunter
+
+## Introduction
+
+Dying hunter is a game that is close to wolf game. There is an hunter and preys.
+The hunter have to catch a prey. Then the prey become the hunter and the hunter a prey.
+The game is time boxed and at the end of the timer the hunter loose.
+Then a new hunter is selected and we run the game again until there are a final winner
+aka the last prey alive on the board.
+
+## Game
+
+## Ranking
