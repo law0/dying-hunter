@@ -79,6 +79,9 @@ class TournamentManager:
                 state = "RUNNING"
                 if self.currentArena.state == State.ENDED:
                     state = "DONE"
+                    winner = self.game.getArena(arenaId).getWinner()
+                    if winner == None:
+                        winner = ""
             view.append((state,winner,arenaId))
         return view
 
@@ -97,6 +100,10 @@ class TournamentManager:
                         pts = pts - 2
                     else:
                         pts = 0
+
+    def performTick(self):
+        if self.currentArena != None and self.currentArena.state == State.ENDED:
+            self.computeRanking()
 
     def getRankingView(self):
         ranking = []

@@ -87,6 +87,7 @@ class Server:
         for arena in self.arenas.values():
             arena.performTick()
         self.playerManager.performTick()
+        self.tournamentManager.performTick()
 
     def dump(self):
         self.playerManager.dump()
