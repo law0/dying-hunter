@@ -1,12 +1,24 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>FCEE - Dying Wolf</title>
+        <title>Dying Hunter - Admin</title>
+        <!-- JS -->
         <script src="./admin.js" type="text/javascript"></script>
+        <!-- CSS -->
+        <link rel="stylesheet" href="./common.css">
+        <link rel="stylesheet" href="./admin.css">
+        <!-- Favicon -->
+        <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+        <link rel="manifest" href="/site.webmanifest">
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+        <meta name="msapplication-TileColor" content="#da532c">
+        <meta name="theme-color" content="#ffffff">
     </head>
     <body>
-        <h1>Dying wolf Admin interfaces</h1>
-        <table>
+        <h1>Admin interface</h1>
+        <table class="center">
             <tr>
                 <td>
                     <button id="ModeDemo" onclick='sendCmd("setMode demo")'>Mode demo</button>
@@ -25,22 +37,24 @@
                 </td>
             </tr>
             <tr>
-                <td>
+                <td colspan="5">
                     <div style="height: 20px;"/>
                 </td>
             </tr>
             <tr>
-                <td>
+                <td colspan="5">
                     <button id="NextStep" onclick="nextStep()">Start</button>
                 </td>
             </tr>
         </table>
-        <br>
-        <br>
-        <span id="CurrentMode">loading</span>
-        <br>
-        <span id="CurrentStep"></span>
-        <br>
-        <span id="CurrentGame"></span>
+        <div class="center width-container">
+            <br>
+            <br>
+            <span class="status" id="CurrentMode">loading</span>
+            <br>
+            <span class="status" id="CurrentStep"></span>
+            <br>
+            <span class="status" id="CurrentGame"></span>
+        </div>
     </body>
 </html>

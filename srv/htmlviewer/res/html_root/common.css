@@ -1,0 +1,50 @@
+body {
+  background-color: lightblue;
+}
+
+h1 {
+    font-size: 48px;
+    font-family:"Segoe print", Arial, Helvetica, sans-serif;
+    padding:10px 10px 10px 10px;
+    margin:16px auto;
+    font-weight:lighter;
+    text-align:center;
+    width: 100%
+    min-height:150px;
+}
+
+h2 {
+    font-size: 36px;
+    font-family:"Segoe print", Arial, Helvetica, sans-serif;
+    padding:2px 2px 2px 2px;
+    font-weight:lighter;
+    text-align:center;
+    width: 100%
+    min-height:150px;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+span.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    width: 100%;
+}
+
+.width-container {
+    width: 100%;
+    text-align: center;
+}
+
+.text {
+    font-size: 24px;
+    font-family: Times, "Times New Roman", Georgia, serif;
+    padding: 2px;
+    font-weight:lighter;
+}

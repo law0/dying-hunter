@@ -1,0 +1,7 @@
+.playImg:hover {
+  filter: invert(100%)
+}
+
+.playImg:active {
+  filter: sepia(100%)
+}

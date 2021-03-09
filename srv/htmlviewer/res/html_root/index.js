@@ -23,38 +23,51 @@ class GameIndexViewer {
         let playerDiv = document.getElementById("PlayersDiv")
         let playerList = data["Players"]
         playerDiv.innerHTML = ""
-        let ul = playerDiv.appendChild(document.createElement('ul'));
-        for (var i=0; i < playerList.length; i++ ) {
-            let name = playerList[i][0]
-            let score = playerList[i][1]
-            let li = document.createElement('li')
-            ul.appendChild(li);
-            li.innerHTML = name+" - "+score+" pts"
+        if (playerList.length > 0) {
+            let ol = playerDiv.appendChild(document.createElement('ol'));
+            for (var i=0; i < playerList.length; i++ ) {
+                let name = playerList[i][0]
+                let score = playerList[i][1]
+                let li = document.createElement('li')
+                ol.appendChild(li);
+                li.innerHTML = name+" - "+score+" pts"
+            }
+        } else {
+            playerDiv.innerHTML = "No players for the moment"
         }
         let matchsDiv = document.getElementById("MatchsDiv")
         let matchsList = data["Matchs"]
         matchsDiv.innerHTML = ""
-        ul = matchsDiv.appendChild(document.createElement('ul'));
-        for (var i=0; i < matchsList.length; i++ ) {
-            let status = matchsList[i][0]
-            let winner = matchsList[i][1]
-            let id = matchsList[i][2]
-            let li = document.createElement('li')
-            let link = document.createElement('a')
-            let text = document.createElement('span')
-            text.innerHTML = "Game "+id
-            if (status == "TODO") {
-                text.innerHTML += " - Waiting start signal "
-            }  else if (status == "RUNNING") {
-                text.innerHTML += " - In progress "
-            } else {
-                text.innerHTML += " - Winner : "+winner+" "
+        if (matchsList.length > 0) {
+            let ol = matchsDiv.appendChild(document.createElement('ol'));
+            for (var i=0; i < matchsList.length; i++ ) {
+                let status = matchsList[i][0]
+                let winner = matchsList[i][1]
+                let id = matchsList[i][2]
+                let li = document.createElement('li')
+                let link = document.createElement('a')
+                let text = document.createElement('span')
+                text.innerHTML = "Game "+id
+                if (status == "TODO") {
+                    text.innerHTML += " - Waiting start signal "
+                }  else if (status == "RUNNING") {
+                    text.innerHTML += " - In progress "
+                } else {
+                    text.innerHTML += " - Winner : "+winner+" "
+                }
+                var img = document.createElement('img')
+                img.alt = "View"
+                img.src = "./play.png"
+                img.width = 15
+                img.className ="playImg"
+                link.href = "./gameView.html?id="+id
+                link.appendChild(img)
+                li.appendChild(text)
+                li.appendChild(link)
+                ol.appendChild(li);
             }
-            link.innerHTML = "View"
-            link.href = "./gameView.html?id="+id
-            li.appendChild(text)
-            li.appendChild(link)
-            ul.appendChild(li);
+        } else  {
+            matchsDiv.innerHTML = "Unavailable until player subscription ended"
         }
     }
 }

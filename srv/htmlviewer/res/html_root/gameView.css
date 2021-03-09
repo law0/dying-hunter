@@ -1,12 +1,13 @@
 table.board {
-    margin: 80px auto;
+    margin: auto;
     background: #999;
-    border: 25px solid #333;
-    /*border-collapse: collapse; /* */
+    border: 10px solid #333;
 }
 td.board {
-    width: 70px; height: 70px;
+    width: 80px; height: 80px;
     border: 2px solid #333; /* */
+    text-align: center;
+    vertical-align: middle;
 }
 tr.board:nth-child(odd) td.board:nth-child(even),
 tr.board:nth-child(even) td.board:nth-child(odd) {
@@ -14,13 +15,21 @@ tr.board:nth-child(even) td.board:nth-child(odd) {
 }
 
 div.player {
+    margin: auto;
     text-align: center;
-    width: 70px; height: 70px;
+    vertical-align: middle;
+    width: 75px; height: 75px;
 }
 
 span.logo {
-    margin-top: 10px;
+    margin-top: 15px;
     margin-bottom: auto;
     margin-left: auto;
     margin-right: auto;
+}
+
+span.board-container {
+    width: 80px; height: 80px;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
 }

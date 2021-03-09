@@ -29,12 +29,13 @@ class GameViewer {
         let arena = game["board"];
         let state = game["state"];
         let stateRemainingTicks = game["remainingTicks"];
-        let stateNames = ["is pending", "- Round will start in ", "- Remining turn time : ", "is over"];
+        let stateNames = ["pending", "round will start in ", "round running, remains ", "game over"];
         let ranking = game["ranking"];
         let rankingNode = document.getElementById("Ranking");
-        document.getElementById("Title").innerHTML = "Game "+getUrlParam("id")+" "+stateNames[state];
+        document.getElementById("Title").innerHTML = "This is game "+getUrlParam("id");
+        document.getElementById("Status").innerHTML = "Status : "+stateNames[state];
         if (state == 1 || state == 2) {
-            document.getElementById("Title").innerHTML += stateRemainingTicks+" seconds";
+            document.getElementById("Status").innerHTML += stateRemainingTicks+" ticks";
         }
         let holder = document.getElementById("Board");
         holder.innerHTML = '';
@@ -43,6 +44,7 @@ class GameViewer {
         holder.appendChild(table);
         let length = arena.length;
         let heigth = arena[0].length;
+        let nbPlayerAlive = 0;
         for (var y=0; y < heigth; y++ ) {
             let line = document.createElement('tr');
             line.className = "board";
@@ -50,8 +52,9 @@ class GameViewer {
                 let cell = document.createElement('td');
                 cell.className = "board";
                 if (arena[x][y] != "") {
+                    nbPlayerAlive += 1;
                     let player = document.createElement('div');
-                    player.className = "player"
+                    player.className = "player";
                     let icon = document.createElement('span');
                     let text = document.createElement('span');
 
@@ -87,12 +90,25 @@ class GameViewer {
             }
             table.appendChild(line);
         }
-        rankingNode.innerHTML = ""
-        var ul = rankingNode.appendChild(document.createElement('ul'));
-        for (var i in ranking) {
-            var li = document.createElement('li')
-            ul.appendChild(li);
-            li.innerHTML = ranking[i]
+        rankingNode.innerHTML = "";
+        if (state == 0) {
+            rankingNode.innerHTML = "Unavailable until games is started";
+        } else {
+            var ol = rankingNode.appendChild(document.createElement('ol'));
+            if (state == 3) {
+                nbPlayerAlive = 0
+            }
+            for (var i=0; i<nbPlayerAlive; i++)
+            {
+                var li = document.createElement('li')
+                ol.appendChild(li);
+                li.innerHTML = "Undefined yet"
+            }
+            for (var i in ranking) {
+                var li = document.createElement('li')
+                ol.appendChild(li);
+                li.innerHTML = ranking[i]
+            }
         }
     }
 }
