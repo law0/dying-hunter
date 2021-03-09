@@ -224,6 +224,7 @@ class Arena:
         ranking = []
         for pos in sorted(ratable.keys()):
             ranking.append(ratable[pos])
+        res["gameId"] = self.id
         res["remainingTicks"] = int(self.stateReminingTick)
         res["state"] = int(self.state)
         res["board"] = board

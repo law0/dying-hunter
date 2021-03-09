@@ -67,6 +67,7 @@ The service will send a data response to the command VIEW.
 The response is a JSON representation of the game.
 
 The record is a JSON map containing the following KEYS:
+- *gameId*: value is the identifier of current game. *N.B* -1 means no current game.
 - *state*: value is the current game state as an integer. The states are the following :
     - *0* for *Pending* : The game is not launched yet. Players are connecting. Nothing else could be done.
     - *1* for *Ready* : the game will be launched in a few ticks. Roles, Player status and position are available. Only view is taken into account.
@@ -81,4 +82,4 @@ The record is a JSON map containing the following KEYS:
         - *Y* is the role : *"P"* for *prey* or *"H"* for *hunter*
         - *Z* is the status : *"S"* for *safe*, *"N"* for *normal* or *"F"* for *frozen*
 
-*Example* : {"remainingTicks": 0, "state": 0, "board": [["", "", "", "", "", "Faker/P/S"], ["", "", "Dumb/P/S", "", "", "Troll/P/S"], ["Dummy/P/S", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]}
+*Example* : {"gameId": 0, "remainingTicks": 0, "state": 0, "board": [["", "", "", "", "", "Faker/P/S"], ["", "", "Dumb/P/S", "", "", "Troll/P/S"], ["Dummy/P/S", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""], ["", "", "", "", "", ""]]}
