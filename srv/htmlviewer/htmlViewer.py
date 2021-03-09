@@ -22,7 +22,7 @@ class GameWebsocketManager:
                elif cmd.startswith("viewArena"):
                    await self.handleViewArena(websocket, cmd.split()[1])
                else:
-                   await self.handleAdminCmds(websocket, cmd)
+                   await self.handleServerCmds(websocket, cmd)
             except:
                 break
 
@@ -37,8 +37,8 @@ class GameWebsocketManager:
         jsonArena = json.dumps(self.game.getArena(int(id)).serialize())
         await websocket.send(jsonArena)
 
-    async def handleAdminCmds(self, websocket, cmd):
-        res = self.game.handleAdminCmds(cmd)
+    async def handleServerCmds(self, websocket, cmd):
+        res = self.game.handleServerCmds(cmd)
         if res != None:
             jsonRes = json.dumps(res)
             await websocket.send(jsonRes)

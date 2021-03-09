@@ -13,6 +13,7 @@ class ServerMode(IntEnum):
     PG_EMPTY = 2
     MATCH = 3
     TOURNAMENT = 4
+    TRAINING = 5
 
     def fromString(str):
         if str == "demo":
@@ -23,6 +24,8 @@ class ServerMode(IntEnum):
             return ServerMode.PG_EMPTY
         elif str == "match":
             return ServerMode.MATCH
+        elif str == "training":
+            return ServerMode.TRAINING
         return ServerMode.TOURNAMENT
 
     def toString(mode):
@@ -34,6 +37,8 @@ class ServerMode(IntEnum):
             return "pgempty"
         elif mode == ServerMode.MATCH:
             return "match"
+        elif mode == ServerMode.TRAINING:
+            return "training"
         return "tournament"
 
 class Server:
@@ -89,10 +94,19 @@ class Server:
         return self.playerManager.getPlayerView(name)
 
     def performTick(self):
+        if self.mode == ServerMode.TRAINING:
+            return
         for arena in self.arenas.values():
             arena.performTick()
         self.playerManager.performTick()
         self.tournamentManager.performTick()
+
+    def performTrainingTick(self):
+        if self.mode != ServerMode.TRAINING:
+            return
+        for arena in self.arenas.values():
+            arena.performTick()
+        self.playerManager.performTick()
 
     def dump(self):
         self.playerManager.dump()
@@ -102,34 +116,79 @@ class Server:
         self.arenas = {}
         self.nextArenaId=0
 
+    def handleTrainingCmds(self, cmd):
+        if self.mode != ServerMode.TRAINING:
+            print("Reject training commands {} while not in training mode".format(cmd))
+            return None
+        if cmd == "addTrainingDummy":
+            dummyName = "DU_"+str(len(self.playerManager.arena.players))
+            self.playerManager.arena.addPlayer(dummyName)
+            return None
+        if cmd == "doTrainingTick":
+            self.performTrainingTick()
+            return None
+        if cmd.startswith("trainingMove"):
+            name = cmd.split()[1]
+            x = int(cmd.split()[2])
+            y = int(cmd.split()[3])
+            self.playerManager.arena.setPosition(name, x, y)
+            return None
+        if cmd.startswith("trainingSetHunter"):
+            name = cmd.split()[1]
+            self.playerManager.arena.setHunter(name)
+        if cmd.startswith("trainingSetFrozen"):
+            name = cmd.split()[1]
+            self.playerManager.arena.setFrozen(name)
+        if cmd.startswith("trainingSetSafe"):
+            name = cmd.split()[1]
+            self.playerManager.arena.setSafe(name)
+        if cmd.startswith("trainingSetNormal"):
+            name = cmd.split()[1]
+            self.playerManager.arena.setNormal(name)
 
-    def handleAdminCmds(self, cmd):
+        return None
+
+    def handleServerCmds(self, cmd):
         if cmd.startswith("setMode"):
             self.changeMode(ServerMode.fromString(cmd.split()[1]))
             return None
         if cmd.startswith("getServerView"):
             return self.getServerView()
+            return None
         if cmd == "startPG":
             if self.mode == ServerMode.DEMO:
                 self.setupPlayground(True)
                 self.runArena()
+                return None
             else:
                 self.setupPlayground(self.mode == ServerMode.PG_BOTS)
+                return None
         if cmd == "startMatch":
             self.setupMatch()
+            return None
         if cmd == "stopPG":
             self.dump()
+            return None
         if cmd == "startTournament":
             if self.mode == ServerMode.TOURNAMENT:
                 self.setupTournament()
+            return None
         if cmd == "closeSubs":
             if self.mode == ServerMode.TOURNAMENT:
                 self.launchTournament()
+            return None
         if cmd == "startNextGame":
             if self.mode == ServerMode.TOURNAMENT:
                 self.launchTournamentNextMatch()
             else:
                 self.runArena()
+            return None
+        #TODO remove try catch
+        try:
+            res = self.handleTrainingCmds(cmd)
+        except Exception as e:
+            print(e)
+        return res
 
     def changeMode(self, mode):
         if mode == self.mode:

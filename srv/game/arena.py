@@ -187,9 +187,60 @@ class Arena:
                 contact.status = Status.SAFE
                 contact.statusTime = 0
             elif contact.role == Role.PREY:
-                if contact.status != Status.SAFE:
+                if contact.status != Status.SAFE and contact.status != Status.FROZEN:
                     contact.status = Status.FROZEN
                     contact.statusTime = 0
+
+    def setPosition(self, name, x, y):
+        player = self.players[name]
+        if self.board[x][y] == None:
+            self.board[player.x][player.y] = None
+            player.x = x
+            player.y = y
+            self.board[player.x][player.y] = player
+        else:
+            contact = self.board[x][y]
+            if player.role == Role.HUNTER and contact.role == Role.PREY:
+                if contact.status != Status.SAFE:
+                    contact.role = Role.HUNTER
+                    contact.status = Status.NORMAL
+                    player.role = Role.PREY
+                    player.status = Status.SAFE
+                    player.statusTime = 0
+            elif contact.role == Role.HUNTER and player.role == Role.PREY:
+                player.role = Role.HUNTER
+                player.status = Status.NORMAL
+                contact.role = Role.PREY
+                contact.status = Status.SAFE
+                contact.statusTime = 0
+            elif contact.role == Role.PREY:
+                if contact.status != Status.SAFE and contact.status != Status.FROZEN:
+                    contact.status = Status.FROZEN
+                    contact.statusTime = 0
+
+    def setHunter(self, name):
+        for player in self.players.values():
+            if player.role == Role.HUNTER:
+                player.role = Role.PREY
+                player.status = Status.NORMAL
+        player = self.players[name]
+        player.role = Role.HUNTER
+        player.status = Status.NORMAL
+
+    def setFrozen(self, name):
+        player = self.players[name]
+        if player.role != Role.HUNTER:
+            player.status = Status.FROZEN
+
+    def setSafe(self, name):
+        player = self.players[name]
+        if player.role != Role.HUNTER:
+            player.status = Status.SAFE
+
+    def setNormal(self, name):
+        player = self.players[name]
+        if player.role != Role.HUNTER:
+            player.status = Status.NORMAL
 
     def getWinner(self):
         if self.state != State.ENDED:

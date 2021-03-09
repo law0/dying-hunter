@@ -20,3 +20,6 @@ where id is the id of the game.
 
 In demo, playground and match mode the ID of the game is always 0
 In tournament mode, index give link to all games of the tournament, and game status for each game.
+
+If you are implementing a client, a dedicated training vue is available at
+http://localhost:8086/training.html
