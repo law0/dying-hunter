@@ -7,8 +7,35 @@ import math
 import socket
 import sys
 import time
+import random
 
-def dhapi_get_socket(server_addr='localhost', server_port=8082):
+SERVER_ADDR='localhost'
+SERVER_PORT=8082
+DEMO_MODE="random"
+
+"""
+README !
+This a simple example of an avatar controller for the dying hunter game.
+It is advise to first look at the main() directly.
+
+This example implements two strategies:
+    1. "random", you guessed it, it does random moves
+    2. "simple", goes to closest player if hunter, run away from hunter otherwise
+
+A simple api (dhapi_*) is provided, but you're free to implement your own
+as it is quite simple (really. It just open a socket and send stuff)
+
+"""
+
+
+
+
+"""
+################
+The 'API'
+################
+"""
+def dhapi_get_socket(server_addr=SERVER_ADDR, server_port=SERVER_PORT):
     if not hasattr(dhapi_get_socket, "sock"):
         dhapi_get_socket.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_address = (server_addr, server_port)
@@ -74,29 +101,131 @@ def dhapi_get_view():
 
 
 
+
+
+"""
+################
+The example
+################
+"""
+# A class representing players. Note that you don't have to use it at all.
+# You can do your own, or do otherwise.
 class Player:
-    def __init__(self, x, y):
+    def __init__(self, x, y, name, role):
         self.x = x
         self.y = y
+        self.name = name
+        self.role = role
 
+
+
+# Guess what it does
+def random_play():
+    return random.choice(["UP", "DOWN", "LEFT", "RIGHT"])
+
+# Go to the closest if hunter, else run away from hunter
+def simple_play(view, team_name):
+    me = Player(0, 0, team_name, " ")
+    hunter = Player(0, 0, " ", "H")
+    players = []
+    imHunter = False
+    board = view["board"]
+
+    #Reading the board
+    for x in range(0, len(board)):
+        for y in range(0, len(board[0])):
+            if len(board[x][y]) != 0:
+                split = board[x][y].split("/")
+                name = split[0]
+                role = split[1]
+                status  = split[2]
+                if name == team_name:
+                    #print(board[x][y])
+                    me.x = x
+                    me.y = y
+                    imHunter = (role == "H")
+                elif role == "H":
+                    hunter.x = x
+                    hunter.y = y
+                    hunter.name = name
+                else:
+                    players.append(Player(x, y, name, role))
+
+    direction = ""
+    moves = [("UP", me.x, me.y-1),
+             ("DOWN", me.x, me.y+1),
+             ("LEFT", me.x-1, me.y),
+             ("RIGHT", me.x+1, me.y)]
+
+    #distance = lambda x0,y0,x1,y1: math.sqrt((x0 - x1)**2 + (y0 - y1)**2)
+    distance = lambda x0,y0,x1,y1: abs(x0 - x1) + abs(y0 - y1)
+
+    #Choose what to do
+    if imHunter:
+        print("I'm hunter!")
+        #Chase closest player
+
+        # Get closest player
+        target = sorted(players, key=lambda p: distance(p.x,p.y,me.x,me.y))[0]
+
+        print("Closest player {} at x:{} y:{}".format(target.name, target.x, target.y))
+        print("Me x:{} y:{}".format(me.x, me.y))
+
+        # choose the move that will minimize the distance
+        direction = sorted(moves, key=lambda move: distance(target.x,target.y,move[1],move[2]))[0][0]
+
+    else:
+        print("I'm player!")
+        #Run AWAY from hunter
+        print("Hunter {} at x:{} y:{}".format(hunter.name, hunter.x, hunter.y))
+        print("Me x:{} y:{}".format(me.x, me.y))
+
+        # choose the move that will maximize the distance
+        direction = sorted(moves, key=lambda move: distance(hunter.x,hunter.y,move[1],move[2]), reverse=True)[0][0]
+
+    print("I'm going {}\n\n".format(direction))
+
+    return direction
+
+
+
+
+
+"""
+###############
+The main stuff
+###############
+"""
 def init_arguments():
     parser = argparse.ArgumentParser(description='dying wolf client example')
     parser.add_argument('-n', '--name', dest='name',
                           help='Name of the client', default="Dumb")
+    parser.add_argument('--addr', dest='server_addr',
+                          help='server addr, default: localhost', default='localhost')
+    parser.add_argument('--port', dest='server_port',
+                          help='server port, default: 8082', default=8082)
+    parser.add_argument('--demo-mode', dest='demo_mode',
+                          help='Mode for this demo avatar: random or simple, default: random', 
+                          default='random')
     return parser.parse_args()
 
 
 
 def main():
     arg_parsed = init_arguments()
-    myName = arg_parsed.name
+    team_name = arg_parsed.name
+    SERVER_ADDR = arg_parsed.server_addr
+    SERVER_PORT = arg_parsed.server_port
+    DEMO_MODE = arg_parsed.demo_mode
     
-    if not dhapi_send_hello(myName):
+
+    # Connect us to a game !
+    if not dhapi_send_hello(team_name):
         print("Couldn't say hello")
         return 1
 
-    xTurn = True
     while True:
+        # Get a view of the current state of the grid
         view = dhapi_get_view()
         if view is None:
             continue
@@ -105,72 +234,13 @@ def main():
         if state != 2:
             #Game is pending, ready or ended so nothing to do
             continue
+
         #Game is running !
-        me = Player(0, 0)
-        hunter = Player(0, 0)
-        players = []
-        imHunter = False
-        board = view["board"]
 
-        #Reading the board
-        for x in range(len(board)):
-            for y in range(len(board[0])):
-                if len(board[x][y]) != 0:
-                    split = board[x][y].split("/")
-                    name = split[0]
-                    role = split[1]
-                    status  = split[2]
-                    if name == myName:
-                        print(board[x][y])
-                        me.x = x
-                        me.y = y
-                        imHunter = (role == "H")
-                        print(imHunter)
-                    elif role == "H":
-                        hunter.x = x
-                        hunter.y = y
-                    else:
-                        players.append(Player(x, y))
+        # Choose a direction in function of the game status !
+        # This is probably where you will code your strategies !
+        direction = random_play() if DEMO_MODE == "random" else simple_play(view, team_name)
 
-        #Choose what to do
-        direction = ""
-        if imHunter:
-            #Chase closest player
-            target = None
-            dist = -1
-            print(players)
-            for player in players:
-                player_dist = math.sqrt((player.x-me.x)**2+(player.y-me.y)**2)
-                if dist < 0 or player_dist < dist:
-                    dist = player_dist
-                    target = player
-
-            print("Target x:{} y:{}".format(target.x, target.y))
-            print("Me x:{} y:{}".format(me.x, me.y))
-            if xTurn:
-                direction = "LEFT"
-                if(target.x > me.x):
-                    direction = "RIGHT"
-            else:
-                direction = "UP"
-                if(target.y > me.y):
-                    direction = "DOWN"
-        else:
-            #Run away from hunter
-            print("Hunter x:{} y:{}".format(hunter.x, hunter.y))
-            print("Me x:{} y:{}".format(me.x, me.y))
-            if xTurn:
-                direction = "RIGHT"
-                if(hunter.x >= me.x):
-                    direction = "LEFT"
-            else:
-                direction = "DOWN"
-                if(hunter.y >= me.y):
-                    direction = "UP"
-
-
-
-        print(direction)
         if direction == "UP":
             dhapi_send_UP()
         elif direction == "DOWN":
@@ -180,8 +250,6 @@ def main():
         elif direction == "RIGHT":
             dhapi_send_RIGHT()
 
-
-        xTurn = not xTurn
         time.sleep(1)
 
 if __name__ == "__main__":
