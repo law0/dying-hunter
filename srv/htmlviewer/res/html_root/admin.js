@@ -70,7 +70,11 @@ class GameAdminViewer {
                     } else {
                         nextStepName = "Run"
                     }
-                    cmd = "startPG"
+                    if (this.cur_mode == "match") {
+                        cmd = "startMatch"
+                    } else {
+                        cmd = "startPG"
+                    }
                 } else if(this.cur_step == "pending") {
                     nextStepName = "Stop"
                     cmd = "startNextGame"

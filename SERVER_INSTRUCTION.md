@@ -18,5 +18,5 @@ http://localhost:8086/gameView.html?id=0
 
 where id is the id of the game.
 
-In playground and demo mode the ID of the game is always 0
-In tournament mode, index give link to all games of the tournament.
+In demo, playground and match mode the ID of the game is always 0
+In tournament mode, index give link to all games of the tournament, and game status for each game.

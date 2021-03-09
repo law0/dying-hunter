@@ -11,7 +11,8 @@ class ServerMode(IntEnum):
     DEMO = 0
     PG_BOTS = 1
     PG_EMPTY = 2
-    TOURNAMENT = 3
+    MATCH = 3
+    TOURNAMENT = 4
 
     def fromString(str):
         if str == "demo":
@@ -20,6 +21,8 @@ class ServerMode(IntEnum):
             return ServerMode.PG_BOTS
         elif str == "pgempty":
             return ServerMode.PG_EMPTY
+        elif str == "match":
+            return ServerMode.MATCH
         return ServerMode.TOURNAMENT
 
     def toString(mode):
@@ -29,6 +32,8 @@ class ServerMode(IntEnum):
             return "pgbots"
         elif mode == ServerMode.PG_EMPTY:
             return "pgempty"
+        elif mode == ServerMode.MATCH:
+            return "match"
         return "tournament"
 
 class Server:
@@ -107,9 +112,11 @@ class Server:
         if cmd == "startPG":
             if self.mode == ServerMode.DEMO:
                 self.setupPlayground(True)
-                self.runPlayground()
+                self.runArena()
             else:
                 self.setupPlayground(self.mode == ServerMode.PG_BOTS)
+        if cmd == "startMatch":
+            self.setupMatch()
         if cmd == "stopPG":
             self.dump()
         if cmd == "startTournament":
@@ -122,7 +129,7 @@ class Server:
             if self.mode == ServerMode.TOURNAMENT:
                 self.launchTournamentNextMatch()
             else:
-                self.runPlayground()
+                self.runArena()
 
     def changeMode(self, mode):
         if mode == self.mode:
@@ -180,7 +187,12 @@ class Server:
             self.playerManager.addBot("Faker")
             self.playerManager.addBot("Troll")
 
-    def runPlayground(self):
+    def setupMatch(self):
+        id = self.addArena(6,6)
+        arena = self.getArena(id)
+        self.playerManager.setArena(arena)
+
+    def runArena(self):
         self.playerManager.arena.startGame()
 
     def setupTournament(self):
