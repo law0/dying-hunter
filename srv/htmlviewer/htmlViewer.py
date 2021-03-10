@@ -43,6 +43,10 @@ class GameWebsocketManager:
             jsonRes = json.dumps(res)
             await websocket.send(jsonRes)
 
+class quietServer(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass
+
 class htmlViewer:
 
     def __init__(self, port, gameServer):
@@ -57,7 +61,10 @@ class htmlViewer:
 
     def httpServerMain(self):
         server = http.server.HTTPServer
-        handler = http.server.SimpleHTTPRequestHandler
+
+        # use handler = http.server.SimpleHTTPRequestHandler to get http logs
+        handler = quietServer
+
         print("Viewer actif sur le port :", self.port)
 
         web_dir = os.path.join(os.path.dirname(__file__), 'res/html_root')
