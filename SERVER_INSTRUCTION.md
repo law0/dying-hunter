@@ -23,3 +23,6 @@ In tournament mode, index give link to all games of the tournament, and game sta
 
 If you are implementing a client, a dedicated training vue is available at
 http://localhost:8086/training.html
+
+Once the server launched some tutorial videos are available at
+http://localhost:8086/tuto.html
