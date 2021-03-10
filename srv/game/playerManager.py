@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import random
+from game.bot import *
 
 class PlayerManager:
 
@@ -68,7 +69,10 @@ class PlayerManager:
         random.shuffle(bots)
         for bot in bots:
             if self.bots[bot].alive:
-                self.arena.move(bot, random.choice(directions))
+                if bot[:5] == "smart":
+                    self.arena.move(bot, get_clever_move(bot, self.arena.board))
+                else:
+                    self.arena.move(bot, random.choice(directions))
 
     def movePlayers(self):
         if self.arena == None:

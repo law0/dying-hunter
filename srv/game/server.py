@@ -242,9 +242,10 @@ class Server:
         arena = self.getArena(id)
         self.playerManager.setArena(arena)
         if withBots:
+            self.playerManager.addBot("smart1")
+            self.playerManager.addBot("smart2")
             self.playerManager.addBot("Dummy")
-            self.playerManager.addBot("Faker")
-            self.playerManager.addBot("Troll")
+            self.playerManager.addBot("smart3")
 
     def setupMatch(self):
         id = self.addArena(6,6)
