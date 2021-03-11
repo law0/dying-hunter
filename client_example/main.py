@@ -224,6 +224,7 @@ def main():
         print("Couldn't say hello")
         return 1
 
+    old_state = -1
     while True:
         # Get a view of the current state of the grid
         view = dhapi_get_view()
@@ -231,6 +232,12 @@ def main():
             continue
 
         state = view["state"]
+        if state == 0 and state != old_state:
+            print("The game is about to start:\n"+
+                "http://{}:{}/gameView.html?id={}".format(SERVER_ADDR,8086,view["gameId"]))
+
+        old_state = state
+
         if state != 2:
             #Game is pending, ready or ended so nothing to do
             continue

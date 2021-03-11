@@ -25,6 +25,7 @@ class PlayerManager:
             return None
         res = {}
         ser = self.arena.serialize()
+        res["gameId"] = ser["gameId"]
         res["remainingTicks"] = ser["remainingTicks"]
         res["state"] = ser["state"]
         res["board"] = ser["board"]
